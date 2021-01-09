@@ -1,6 +1,6 @@
 /**
 *
-* Solution to course project # <номер на вариант>
+* Solution to course project # <РЅРѕРјРµСЂ РЅР° РІР°СЂРёР°РЅС‚>
 * Introduction to programming course
 * Faculty of Mathematics and Informatics of Sofia University
 * Winter semester 2020/2021
@@ -25,30 +25,22 @@ using namespace std;
 //check if the input is invalid
 int invalidInput (string s)
 {
-    //invalid input if the operator is followed by an operator ( except '(' and ')' )
-    for (int i = 0; i < s.length() - 1; i++)
-    {
-        if ((s[i] == '+' || s[i] == '-' || s[i] == '/' || s[i] == '*' || s[i] == '^') &&
-            (s[i+1] == '+' || s[i+1] == '-' || s[i+1] == '/' || s[i+1] == '*' || s[i+1] == '^'))
-            return 1;
-    }
-
-    //invalid input if there are characters other than the following
+    //check if there are characters other than the following
     for (int i = 0; i < s.length(); i++)
     {
-        if(s[i] != '+' && s[i] != '-' && s[i] != '/' && s[i] != '*' && s[i] != '^' && s[i] != '(' && s[i] != ')' &&
+        if (s[i] != '+' && s[i] != '-' && s[i] != '/' && s[i] != '*' && s[i] != '^' && s[i] != '(' && s[i] != ')' &&
            s[i] != '0' && s[i] != '1' && s[i] != '2' && s[i] != '3' && s[i] != '4' && s[i] != '5' && s[i] != '6' &&
            s[i] != '7' && s[i] != '8' && s[i] != '9' && s[i] != ' ')
             return 1;
     }
 
-    //invalid input if the first element is an operator other than '-' and '('
+    //check if the first element is an operator other than '-' and '('
     if (s[0] == '+' || s[0] == '/' || s[0] == '*' || s[0] == '^' || s[0] == ')')
     {
         return 1;
     }
 
-    //checking for spaces between digits
+    //check for spaces between numbers
     for(int i = 0; i < s.length(); i++)
     {
         if (s[i] == '0' || s[i] == '1' || s[i] == '2' || s[i] == '3' || s[i] == '4' || s[i] == '5' || s[i] == '6'|| s[i] == '7'|| s[i] == '8'|| s[i] == '9')
@@ -60,7 +52,8 @@ int invalidInput (string s)
                 {
                     n++;
                 }
-                if (s[n] == '0' || s[n] == '1' || s[n] == '2' || s[n] == '3' || s[n] == '4' || s[n] == '5' || s[n] == '6'||s[n] == '7'|| s[n] == '8'|| s[n] == '9')
+                if (s[n] == '0' || s[n] == '1' || s[n] == '2' || s[n] == '3' || s[n] == '4' || s[n] == '5' ||
+                    s[n] == '6'||s[n] == '7'|| s[n] == '8'|| s[n] == '9' || s[n] == '(')
                 {
                     return 1;
                 }
@@ -68,28 +61,42 @@ int invalidInput (string s)
         }
     }
 
-    //spaces between operators
+    //check if the operator is followed by another operator ( except '(' and ')' )
     for(int i = 0; i < s.length(); i++)
     {
         if (s[i] == '+' || s[i] == '-' || s[i] == '/' || s[i] == '*' || s[i] == '^')
         {
-            if(s[i+1] == ' ')
+            int n = i + 1;
+            while(s[n] == ' ')
             {
-                int n = i + 2;
-                while(s[n] == ' ')
-                {
-                    n++;
-                }
+                n++;
+            }
 
-                if (s[n] == '+' || s[n] == '-' || s[n] == '/' || s[n] == '*' || s[n] == '^')
-                {
-                    return 1;
-                }
+            if (s[n] == '+' || s[n] == '-' || s[n] == '/' || s[n] == '*' || s[n] == '^')
+            {
+                return 1;
             }
         }
     }
 
-    //checking if all brackets are closed
+    //check if last element is an operator
+    int last_position = s.length() - 1;
+    while (s[last_position] == ' ' && !s.empty())
+    {
+        last_position--;
+    }
+    if (s[last_position] == '+' || s[last_position] == '-' || s[last_position] == '/' || s[last_position] == '*' || s[last_position] == '^')
+    {
+        return 1;
+    }
+
+    //check if string is empty
+    if (s.empty())
+    {
+        return 1;
+    }
+
+    //check if all brackets are closed
     int brackets = 0;
     for(int i = 0; i < s.length(); i++)
     {
@@ -108,6 +115,8 @@ int invalidInput (string s)
     }
 
     return 0;
+
+
 }
 
 //check if char is a digit
@@ -206,7 +215,7 @@ double evaluate (string s)
             else
             {
                 char prev = ops.top();
-                if (getPrecedence(spot) > getPrecedence(prev))
+                if (getPrecedence(spot) >= getPrecedence(prev))
                 {
                     vals.push(val);
                     ops.push(spot);
@@ -238,13 +247,63 @@ double evaluate (string s)
         position ++;
     }
 
+//    while (!ops.empty())
+//    {
+//        double prev = vals.top();
+//        vals.pop();
+//        char spot = ops.top();
+//        ops.pop();
+//        val = operate(prev, val, spot);
+//    }
+    stack<double> opposite_vals;
+    stack<char> opposite_ops;
+
+    vals.push(val);
+
+    //creating stacks where the operators and numbers are in the right order
+    while (!vals.empty())
+    {
+        double transfer = 0;
+        transfer = vals.top();
+        opposite_vals.push(transfer);
+        vals.pop();
+    }
+
     while (!ops.empty())
     {
-        double prev = vals.top();
-        vals.pop();
-        char spot = ops.top();
+        char transfer_ops = 0;
+        transfer_ops = ops.top();
+        opposite_ops.push(transfer_ops);
         ops.pop();
-        val = operate(prev, val, spot);
+    }
+
+
+
+//    cout << endl << "Opposite vals: ";
+//    while (!opposite_vals.empty())
+//    {
+//        cout << opposite_vals.top() << " ";
+//        opposite_vals.pop();
+//    }
+//
+//    cout << endl << "Opposite ops: ";
+//    while (!opposite_ops.empty())
+//    {
+//        cout << opposite_ops.top() << " ";
+//        opposite_ops.pop();
+//    }
+//    cout << endl;
+
+
+    val = opposite_vals.top();
+    opposite_vals.pop();
+    while (!opposite_ops.empty())
+    {
+        double second_val = opposite_vals.top();
+        opposite_vals.pop();
+        char op = opposite_ops.top();
+        val = operate(val, second_val, op);
+        opposite_ops.pop();
     }
 
     return val;
@@ -268,6 +327,9 @@ int main()
         getline(file, firstRow);
         file.close();
     }
+
+    firstRow.resize (firstRow.size()+1,'+');
+    firstRow.resize (firstRow.size()+1,'0');
 
     if (invalidInput(firstRow))
     {
