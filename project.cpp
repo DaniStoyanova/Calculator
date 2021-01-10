@@ -1,6 +1,6 @@
 /**
 *
-* Solution to course project # 02
+* Solution to course project #2
 * Introduction to programming course
 * Faculty of Mathematics and Informatics of Sofia University
 * Winter semester 2020/2021
@@ -14,29 +14,29 @@
 */
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <stack>
 #include <string>
 #include <fstream>
 
 using namespace std;
 
-//checks if char is a digit
+// checks if char is a digit
 bool isDigit (char c)
 {
     return (c >= '0' && c <= '9');
 }
 
-//checks if char is an operator
+// checks if char is an operator
 bool isOp (char c)
 {
     return (c == '+' || c == '-' || c == '*' || c == '^' || c == '/' || c == '(' || c == ')');
 }
 
-//checks if the input is invalid
-int invalidInput (string s)
+// checks if the input is invalid
+int invalidInput (const string& s)
 {
-    //checks if there are characters other than the following
+    // checks if there are characters other than the following
     for (int i = 0; i < s.length(); i++)
     {
         if (s[i] != '+' && s[i] != '-' && s[i] != '/' && s[i] != '*' && s[i] != '^' && s[i] != '(' && s[i] != ')' &&
@@ -45,7 +45,7 @@ int invalidInput (string s)
             return 1;
     }
 
-    //checks if the brackets are empty and if we have an operator after '('
+    // checks if the brackets are empty and if we have an operator after '('
     for (int i = 0; i < s.length(); i++)
     {
         if (s[i] == '(')
@@ -62,7 +62,7 @@ int invalidInput (string s)
         }
     }
 
-    //dividing by 0
+    // dividing by 0
     for (int i = 0; i < s.length(); i++)
     {
         if (s[i] == '/')
@@ -79,7 +79,7 @@ int invalidInput (string s)
         }
     }
 
-    //checks if string contains only spaces
+    // checks if string contains only spaces
     int character = 0;
     while (s[character] == ' ')
     {
@@ -91,13 +91,13 @@ int invalidInput (string s)
         return 1;
     }
 
-    //checks if the first element is an operator other than '-' and '('
+    // checks if the first element is an operator other than '-' and '('
     if (s[0] == '+' || s[0] == '/' || s[0] == '*' || s[0] == '^' || s[0] == ')')
     {
         return 1;
     }
 
-    //checks for spaces between numbers
+    // checks for spaces between numbers
     for (int i = 0; i < s.length(); i++)
     {
         if (isDigit(s[i]))
@@ -117,7 +117,7 @@ int invalidInput (string s)
         }
     }
 
-    //checks if the operator is followed by another operator (except '(')
+    // checks if the operator is followed by another operator (except '(')
     for (int i = 0; i < s.length(); i++)
     {
         if (s[i] == '+' || s[i] == '-' || s[i] == '/' || s[i] == '*' || s[i] == '^')
@@ -135,13 +135,13 @@ int invalidInput (string s)
         }
     }
 
-    //checks if string is empty
+    // checks if string is empty
     if (s.empty())
     {
         return 1;
     }
 
-//    checks if brackets are balanced
+    // checks if brackets are balanced
     stack<char> brackets_stack;
 
     for (int i = 0; i < s.length(); i++)
@@ -170,7 +170,7 @@ int invalidInput (string s)
     return 0;
 }
 
-//determine the precedence of an operator
+// determine the precedence of an operator
 int getPrecedence (char c)
 {
     switch (c)
@@ -186,7 +186,7 @@ int getPrecedence (char c)
     }
 }
 
-//evaluate an arithmetic expression
+// evaluate an arithmetic expression
 double operate (double val1, double val2, char op)
 {
     if (op == '+')
@@ -201,8 +201,8 @@ double operate (double val1, double val2, char op)
         return val1 / val2;
 }
 
-//evaluate a string
-double evaluate (string s)
+// evaluate a string
+double evaluate (const string& s)
 {
     stack<double> vals;
     stack<char> ops;
@@ -263,7 +263,7 @@ double evaluate (string s)
                 {
                     if (ops.top() != '(')
                     {
-                        //example: 100 / (5-5)
+                        // example: 100 / (5-5)
                         if (ops.top() == '/' && val == 0){
                             cout << "NaN";
                             exit(-1);
@@ -297,7 +297,7 @@ double evaluate (string s)
 
     vals.push(val);
 
-    //creating stacks where the operators and numbers are in the right order
+    // creating stacks where the operators and numbers are in the right order
     while (!vals.empty())
     {
         double transfer = 0;
@@ -314,7 +314,7 @@ double evaluate (string s)
         ops.pop();
     }
 
-    //calculating until there are no operators left in the operators stack
+    // calculating until there are no operators left in the operators stack
     val = opposite_vals.top();
     opposite_vals.pop();
 
@@ -336,7 +336,7 @@ int main()
     file.open("Sample.txt");
     string firstRow;
 
-    //checks to see if the file opens properly
+    // checks to see if the file opens properly
     if (!file)
     {
         cout << "NaN" << endl;
