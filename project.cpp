@@ -1,6 +1,6 @@
 /**
 *
-* Solution to course project # <номер на вариант>
+* Solution to course project # 02
 * Introduction to programming course
 * Faculty of Mathematics and Informatics of Sofia University
 * Winter semester 2020/2021
@@ -13,7 +13,6 @@
 *
 */
 
-
 #include <iostream>
 #include <math.h>
 #include <stack>
@@ -22,10 +21,22 @@
 
 using namespace std;
 
-//check if the input is invalid
+//checks if char is a digit
+bool isDigit (char c)
+{
+    return (c >= '0' && c <= '9');
+}
+
+//checks if char is an operator
+bool isOp (char c)
+{
+    return (c == '+' || c == '-' || c == '*' || c == '^' || c == '/' || c == '(' || c == ')');
+}
+
+//checks if the input is invalid
 int invalidInput (string s)
 {
-    //check if there are characters other than the following
+    //checks if there are characters other than the following
     for (int i = 0; i < s.length(); i++)
     {
         if (s[i] != '+' && s[i] != '-' && s[i] != '/' && s[i] != '*' && s[i] != '^' && s[i] != '(' && s[i] != ')' &&
@@ -34,26 +45,71 @@ int invalidInput (string s)
             return 1;
     }
 
-    //check if the first element is an operator other than '-' and '('
+    //checks if the brackets are empty and if we have an operator after '('
+    for (int i = 0; i < s.length(); i++)
+    {
+        if (s[i] == '(')
+        {
+            int n = i + 1;
+            while (s[n] == ' ')
+            {
+                n++;
+            }
+            if (s[n] == ')' || s[n] == '*' || s[n] == '/' || s[n] == '+' || s[n] == '^')
+            {
+                return 1;
+            }
+        }
+    }
+
+    //dividing by 0
+    for (int i = 0; i < s.length(); i++)
+    {
+        if (s[i] == '/')
+        {
+            int n = i + 1;
+            while (s[n] == ' ')
+            {
+                n++;
+            }
+            if (s[n] == '0')
+            {
+                return 1;
+            }
+        }
+    }
+
+    //checks if string contains only spaces
+    int character = 0;
+    while (s[character] == ' ')
+    {
+        character++;
+    }
+    // - 3 because i am adding '+0' at the end of the string
+    if (character > s.length() - 3)
+    {
+        return 1;
+    }
+
+    //checks if the first element is an operator other than '-' and '('
     if (s[0] == '+' || s[0] == '/' || s[0] == '*' || s[0] == '^' || s[0] == ')')
     {
         return 1;
     }
 
-    //check for spaces between numbers
-    for(int i = 0; i < s.length(); i++)
+    //checks for spaces between numbers
+    for (int i = 0; i < s.length(); i++)
     {
-        if (s[i] == '0' || s[i] == '1' || s[i] == '2' || s[i] == '3' || s[i] == '4' || s[i] == '5' || s[i] == '6'|| s[i] == '7'|| s[i] == '8'|| s[i] == '9')
+        if (isDigit(s[i]))
         {
-            if(s[i+1] == ' ')
+            if (s[i+1] == ' ')
             {
                 int n = i + 2;
-                while(s[n] == ' ')
+                while (s[n] == ' ')
                 {
                     n++;
                 }
-                if (s[n] == '0' || s[n] == '1' || s[n] == '2' || s[n] == '3' || s[n] == '4' || s[n] == '5' ||
-                    s[n] == '6'||s[n] == '7'|| s[n] == '8'|| s[n] == '9' || s[n] == '(')
+                if (isDigit(s[n]) || s[n] == '(')
                 {
                     return 1;
                 }
@@ -61,74 +117,57 @@ int invalidInput (string s)
         }
     }
 
-    //check if the operator is followed by another operator ( except '(' and ')' )
-    for(int i = 0; i < s.length(); i++)
+    //checks if the operator is followed by another operator (except '(')
+    for (int i = 0; i < s.length(); i++)
     {
         if (s[i] == '+' || s[i] == '-' || s[i] == '/' || s[i] == '*' || s[i] == '^')
         {
             int n = i + 1;
-            while(s[n] == ' ')
+            while (s[n] == ' ')
             {
                 n++;
             }
 
-            if (s[n] == '+' || s[n] == '-' || s[n] == '/' || s[n] == '*' || s[n] == '^')
+            if (s[n] == '+' || s[n] == '-' || s[n] == '/' || s[n] == '*' || s[n] == '^' || s[n] == ')')
             {
                 return 1;
             }
         }
     }
 
-    //check if last element is an operator
-    int last_position = s.length() - 1;
-    while (s[last_position] == ' ' && !s.empty())
-    {
-        last_position--;
-    }
-    if (s[last_position] == '+' || s[last_position] == '-' || s[last_position] == '/' || s[last_position] == '*' || s[last_position] == '^')
-    {
-        return 1;
-    }
-
-    //check if string is empty
+    //checks if string is empty
     if (s.empty())
     {
         return 1;
     }
 
-    //check if all brackets are closed
-    int brackets = 0;
-    for(int i = 0; i < s.length(); i++)
+//    checks if brackets are balanced
+    stack<char> brackets_stack;
+
+    for (int i = 0; i < s.length(); i++)
     {
         if (s[i] == '(')
         {
-            brackets++;
+            brackets_stack.push(s[i]);
         }
-        if (s[i] == ')')
+        else if (s[i] == ')')
         {
-            brackets--;
+            if (brackets_stack.empty())
+            {
+                return 1;
+            }
+            else
+            {
+                brackets_stack.pop();
+            }
         }
     }
-    if (brackets != 0)
+    if (!brackets_stack.empty())
     {
         return 1;
     }
 
     return 0;
-
-
-}
-
-//check if char is a digit
-bool isDigit (char c)
-{
-    return (c >= '0' && c <= '9');
-}
-
-//check if char is an operator
-bool isOp (char c)
-{
-    return (c == '+' || c == '-' || c == '*' || c == '^' || c == '/' || c == '(' || c == ')');
 }
 
 //determine the precedence of an operator
@@ -180,7 +219,6 @@ double evaluate (string s)
         {
             val = (val * 10) + (double)(spot - '0');
         }
-
         else if (isOp(spot))
         {
             if (spot == '(')
@@ -188,7 +226,7 @@ double evaluate (string s)
                 ops.push(spot);
                 val = 0;
             }
-            else if(vals.empty())
+            else if (vals.empty())
             {
                 vals.push(val);
                 ops.push(spot);
@@ -215,25 +253,32 @@ double evaluate (string s)
             else
             {
                 char prev = ops.top();
-                if (getPrecedence(spot) >= getPrecedence(prev))
+                if (getPrecedence(spot) > getPrecedence(prev))
                 {
                     vals.push(val);
                     ops.push(spot);
                     val = 0;
                 }
-
                 else
                 {
-                    if(ops.top() != '(')
+                    if (ops.top() != '(')
                     {
-                        double prev_val = vals.top();
-                        vals.pop();
-                        double prev_op = ops.top();
-                        ops.pop();
-                        prev_val = operate(prev_val, val, prev_op);
-                        vals.push(prev_val);
-                        ops.push(spot);
-                        val = 0;
+                        //example: 100 / (5-5)
+                        if (ops.top() == '/' && val == 0){
+                            cout << "NaN";
+                            exit(-1);
+                        }
+                        else
+                        {
+                            double prev_val = vals.top();
+                            vals.pop();
+                            double prev_op = ops.top();
+                            ops.pop();
+                            prev_val = operate(prev_val, val, prev_op);
+                            vals.push(prev_val);
+                            ops.push(spot);
+                            val = 0;
+                        }
                     }
                     else
                     {
@@ -247,14 +292,6 @@ double evaluate (string s)
         position ++;
     }
 
-//    while (!ops.empty())
-//    {
-//        double prev = vals.top();
-//        vals.pop();
-//        char spot = ops.top();
-//        ops.pop();
-//        val = operate(prev, val, spot);
-//    }
     stack<double> opposite_vals;
     stack<char> opposite_ops;
 
@@ -277,26 +314,10 @@ double evaluate (string s)
         ops.pop();
     }
 
-
-
-//    cout << endl << "Opposite vals: ";
-//    while (!opposite_vals.empty())
-//    {
-//        cout << opposite_vals.top() << " ";
-//        opposite_vals.pop();
-//    }
-//
-//    cout << endl << "Opposite ops: ";
-//    while (!opposite_ops.empty())
-//    {
-//        cout << opposite_ops.top() << " ";
-//        opposite_ops.pop();
-//    }
-//    cout << endl;
-
-
+    //calculating until there are no operators left in the operators stack
     val = opposite_vals.top();
     opposite_vals.pop();
+
     while (!opposite_ops.empty())
     {
         double second_val = opposite_vals.top();
@@ -312,14 +333,13 @@ double evaluate (string s)
 int main()
 {
     ifstream file;
-
     file.open("Sample.txt");
     string firstRow;
 
     //checks to see if the file opens properly
     if (!file)
     {
-        cout << "Error: Could not find the requested file." << endl;
+        cout << "NaN" << endl;
         return -1;
     }
     else
@@ -328,16 +348,16 @@ int main()
         file.close();
     }
 
-    firstRow.resize (firstRow.size()+1,'+');
-    firstRow.resize (firstRow.size()+1,'0');
+    firstRow.resize(firstRow.size()+1,'+');
+    firstRow.resize(firstRow.size()+1,'0');
 
     if (invalidInput(firstRow))
     {
-        cout << "Error: Invalid input!" << endl;
+        cout << "NaN" << endl;
     }
     else
     {
-        cout << "Answer is: " << evaluate(firstRow) << endl;
+        cout << evaluate(firstRow) << endl;
     }
 
     return 0;
