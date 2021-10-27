@@ -6,10 +6,9 @@
 * Winter semester 2020/2021
 *
 * @author Yordanka Stoyanova
-* @idnumber 62512
 * @compiler GCC
 *
-* <main file>
+* 
 *
 */
 
